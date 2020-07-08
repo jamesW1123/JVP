@@ -15,10 +15,7 @@
 /JVP/bin/Debug/JVP.exe
 /JVP/bin/Debug/JVP.exe.config
 /JVP/bin/Debug/JVP.pdb
-<<<<<<< HEAD
 /JVP/Form1.resx
-=======
->>>>>>> Create_GUI
 /JVP/obj/Debug/AxInterop.WMPLib.dll
 /JVP/obj/Debug/Interop.WMPLib.dll
 /JVP/obj/Debug/JVP.csproj.FileListAbsolute.txt
@@ -29,6 +26,7 @@
 /JVP/obj/Debug/JVP.pdb
 /JVP/obj/Debug/JVP.Properties.Resources.resources
 <<<<<<< HEAD
-=======
 /JVP/Form1.resx
->>>>>>> Create_GUI
+/JVP/frmMain.resx
+=======
+>>>>>>> V1_0_0
