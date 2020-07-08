@@ -36,21 +36,21 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuChapters = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.btnPlay = new System.Windows.Forms.Button();
-            this.btnRewind = new System.Windows.Forms.Button();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.btnForward = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.pbProgress = new System.Windows.Forms.ProgressBar();
-            this.lblElapsed = new System.Windows.Forms.Label();
             this.lblTotal = new System.Windows.Forms.Label();
-            this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.barVolume = new System.Windows.Forms.TrackBar();
+            this.btnForward = new System.Windows.Forms.Button();
+            this.btnStop = new System.Windows.Forms.Button();
+            this.btnRewind = new System.Windows.Forms.Button();
+            this.btnPlay = new System.Windows.Forms.Button();
+            this.lblElapsed = new System.Windows.Forms.Label();
+            this.wmPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barVolume)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.wmPlayer)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -76,13 +76,13 @@
             // mnuOpen
             // 
             this.mnuOpen.Name = "mnuOpen";
-            this.mnuOpen.Size = new System.Drawing.Size(180, 22);
+            this.mnuOpen.Size = new System.Drawing.Size(103, 22);
             this.mnuOpen.Text = "Open";
             // 
             // mnuExit
             // 
             this.mnuExit.Name = "mnuExit";
-            this.mnuExit.Size = new System.Drawing.Size(180, 22);
+            this.mnuExit.Size = new System.Drawing.Size(103, 22);
             this.mnuExit.Text = "Exit";
             // 
             // editToolStripMenuItem
@@ -96,7 +96,7 @@
             // mnuChapters
             // 
             this.mnuChapters.Name = "mnuChapters";
-            this.mnuChapters.Size = new System.Drawing.Size(180, 22);
+            this.mnuChapters.Size = new System.Drawing.Size(121, 22);
             this.mnuChapters.Text = "Chapters";
             // 
             // tableLayoutPanel1
@@ -116,7 +116,7 @@
             this.tableLayoutPanel1.Controls.Add(this.lblTotal, 9, 8);
             this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 9);
             this.tableLayoutPanel1.Controls.Add(this.lblElapsed, 0, 8);
-            this.tableLayoutPanel1.Controls.Add(this.axWindowsMediaPlayer1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.wmPlayer, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -134,45 +134,26 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 478);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
-            // btnPlay
+            // pbProgress
             // 
-            this.btnPlay.Location = new System.Drawing.Point(3, 3);
-            this.btnPlay.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(33, 30);
-            this.btnPlay.TabIndex = 0;
-            this.btnPlay.Text = "P";
-            this.btnPlay.UseVisualStyleBackColor = true;
+            this.pbProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.pbProgress, 8);
+            this.pbProgress.Location = new System.Drawing.Point(58, 421);
+            this.pbProgress.Name = "pbProgress";
+            this.pbProgress.Size = new System.Drawing.Size(682, 10);
+            this.pbProgress.TabIndex = 0;
             // 
-            // btnRewind
+            // lblTotal
             // 
-            this.btnRewind.Location = new System.Drawing.Point(42, 7);
-            this.btnRewind.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.btnRewind.Name = "btnRewind";
-            this.btnRewind.Size = new System.Drawing.Size(25, 23);
-            this.btnRewind.TabIndex = 1;
-            this.btnRewind.Text = "R";
-            this.btnRewind.UseVisualStyleBackColor = true;
-            // 
-            // btnStop
-            // 
-            this.btnStop.Location = new System.Drawing.Point(73, 7);
-            this.btnStop.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(25, 23);
-            this.btnStop.TabIndex = 2;
-            this.btnStop.Text = "S";
-            this.btnStop.UseVisualStyleBackColor = true;
-            // 
-            // btnForward
-            // 
-            this.btnForward.Location = new System.Drawing.Point(104, 7);
-            this.btnForward.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.btnForward.Name = "btnForward";
-            this.btnForward.Size = new System.Drawing.Size(25, 23);
-            this.btnForward.TabIndex = 3;
-            this.btnForward.Text = "F";
-            this.btnForward.UseVisualStyleBackColor = true;
+            this.lblTotal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTotal.AutoSize = true;
+            this.lblTotal.Location = new System.Drawing.Point(748, 418);
+            this.lblTotal.Name = "lblTotal";
+            this.lblTotal.Size = new System.Drawing.Size(49, 16);
+            this.lblTotal.TabIndex = 1;
+            this.lblTotal.Text = "00:00:00";
+            this.lblTotal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // panel1
             // 
@@ -191,14 +172,57 @@
             this.panel1.Size = new System.Drawing.Size(794, 36);
             this.panel1.TabIndex = 0;
             // 
-            // pbProgress
+            // barVolume
             // 
-            this.pbProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.SetColumnSpan(this.pbProgress, 8);
-            this.pbProgress.Location = new System.Drawing.Point(58, 421);
-            this.pbProgress.Name = "pbProgress";
-            this.pbProgress.Size = new System.Drawing.Size(682, 10);
-            this.pbProgress.TabIndex = 0;
+            this.barVolume.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.barVolume.AutoSize = false;
+            this.barVolume.Location = new System.Drawing.Point(687, 7);
+            this.barVolume.Maximum = 100;
+            this.barVolume.Name = "barVolume";
+            this.barVolume.Size = new System.Drawing.Size(104, 26);
+            this.barVolume.SmallChange = 2;
+            this.barVolume.TabIndex = 0;
+            this.barVolume.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            // 
+            // btnForward
+            // 
+            this.btnForward.Location = new System.Drawing.Point(104, 7);
+            this.btnForward.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnForward.Name = "btnForward";
+            this.btnForward.Size = new System.Drawing.Size(25, 23);
+            this.btnForward.TabIndex = 3;
+            this.btnForward.Text = "F";
+            this.btnForward.UseVisualStyleBackColor = true;
+            // 
+            // btnStop
+            // 
+            this.btnStop.Location = new System.Drawing.Point(73, 7);
+            this.btnStop.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(25, 23);
+            this.btnStop.TabIndex = 2;
+            this.btnStop.Text = "S";
+            this.btnStop.UseVisualStyleBackColor = true;
+            // 
+            // btnRewind
+            // 
+            this.btnRewind.Location = new System.Drawing.Point(42, 7);
+            this.btnRewind.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnRewind.Name = "btnRewind";
+            this.btnRewind.Size = new System.Drawing.Size(25, 23);
+            this.btnRewind.TabIndex = 1;
+            this.btnRewind.Text = "R";
+            this.btnRewind.UseVisualStyleBackColor = true;
+            // 
+            // btnPlay
+            // 
+            this.btnPlay.Location = new System.Drawing.Point(3, 3);
+            this.btnPlay.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(33, 30);
+            this.btnPlay.TabIndex = 0;
+            this.btnPlay.Text = "P";
+            this.btnPlay.UseVisualStyleBackColor = true;
             // 
             // lblElapsed
             // 
@@ -212,41 +236,17 @@
             this.lblElapsed.Text = "00:00:00";
             this.lblElapsed.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // lblTotal
+            // wmPlayer
             // 
-            this.lblTotal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblTotal.AutoSize = true;
-            this.lblTotal.Location = new System.Drawing.Point(748, 418);
-            this.lblTotal.Name = "lblTotal";
-            this.lblTotal.Size = new System.Drawing.Size(49, 16);
-            this.lblTotal.TabIndex = 1;
-            this.lblTotal.Text = "00:00:00";
-            this.lblTotal.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // axWindowsMediaPlayer1
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.axWindowsMediaPlayer1, 10);
-            this.axWindowsMediaPlayer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axWindowsMediaPlayer1.Enabled = true;
-            this.axWindowsMediaPlayer1.Location = new System.Drawing.Point(3, 3);
-            this.axWindowsMediaPlayer1.Name = "axWindowsMediaPlayer1";
-            this.axWindowsMediaPlayer1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer1.OcxState")));
-            this.tableLayoutPanel1.SetRowSpan(this.axWindowsMediaPlayer1, 7);
-            this.axWindowsMediaPlayer1.Size = new System.Drawing.Size(794, 407);
-            this.axWindowsMediaPlayer1.TabIndex = 2;
-            // 
-            // barVolume
-            // 
-            this.barVolume.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.barVolume.AutoSize = false;
-            this.barVolume.Location = new System.Drawing.Point(687, 7);
-            this.barVolume.Maximum = 100;
-            this.barVolume.Name = "barVolume";
-            this.barVolume.Size = new System.Drawing.Size(104, 26);
-            this.barVolume.SmallChange = 2;
-            this.barVolume.TabIndex = 0;
-            this.barVolume.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            this.tableLayoutPanel1.SetColumnSpan(this.wmPlayer, 10);
+            this.wmPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.wmPlayer.Enabled = true;
+            this.wmPlayer.Location = new System.Drawing.Point(3, 3);
+            this.wmPlayer.Name = "wmPlayer";
+            this.wmPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("wmPlayer.OcxState")));
+            this.tableLayoutPanel1.SetRowSpan(this.wmPlayer, 7);
+            this.wmPlayer.Size = new System.Drawing.Size(794, 407);
+            this.wmPlayer.TabIndex = 2;
             // 
             // frmMain
             // 
@@ -263,8 +263,8 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barVolume)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.wmPlayer)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -286,7 +286,7 @@
         private System.Windows.Forms.Button btnRewind;
         private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.Label lblElapsed;
-        private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
+        private AxWMPLib.AxWindowsMediaPlayer wmPlayer;
         private System.Windows.Forms.TrackBar barVolume;
     }
 }
