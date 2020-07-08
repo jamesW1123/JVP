@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace JVP
 {
-    public partial class frmMain : Form
+    public partial class MainGUI : Form
     {
-        public frmMain()
+        public MainGUI()
         {
             InitializeComponent();
         }
