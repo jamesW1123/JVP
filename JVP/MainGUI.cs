@@ -38,7 +38,8 @@ namespace JVP
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-
+            wmPlayer.Ctlcontrols.stop();
+            isPlaying = false;
         }
 
         private void btnForward_Click(object sender, EventArgs e)
