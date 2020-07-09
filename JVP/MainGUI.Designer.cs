@@ -76,14 +76,16 @@
             // mnuOpen
             // 
             this.mnuOpen.Name = "mnuOpen";
-            this.mnuOpen.Size = new System.Drawing.Size(103, 22);
+            this.mnuOpen.Size = new System.Drawing.Size(180, 22);
             this.mnuOpen.Text = "Open";
+            this.mnuOpen.Click += new System.EventHandler(this.mnuOpen_Click);
             // 
             // mnuExit
             // 
             this.mnuExit.Name = "mnuExit";
-            this.mnuExit.Size = new System.Drawing.Size(103, 22);
+            this.mnuExit.Size = new System.Drawing.Size(180, 22);
             this.mnuExit.Text = "Exit";
+            this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
             // 
             // editToolStripMenuItem
             // 
@@ -96,8 +98,9 @@
             // mnuChapters
             // 
             this.mnuChapters.Name = "mnuChapters";
-            this.mnuChapters.Size = new System.Drawing.Size(121, 22);
+            this.mnuChapters.Size = new System.Drawing.Size(180, 22);
             this.mnuChapters.Text = "Chapters";
+            this.mnuChapters.Click += new System.EventHandler(this.mnuChapters_Click);
             // 
             // tableLayoutPanel1
             // 
@@ -142,6 +145,7 @@
             this.pbProgress.Name = "pbProgress";
             this.pbProgress.Size = new System.Drawing.Size(682, 10);
             this.pbProgress.TabIndex = 0;
+            this.pbProgress.Click += new System.EventHandler(this.pbProgress_Click);
             // 
             // lblTotal
             // 
@@ -183,6 +187,7 @@
             this.barVolume.SmallChange = 2;
             this.barVolume.TabIndex = 0;
             this.barVolume.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            this.barVolume.Scroll += new System.EventHandler(this.barVolume_Scroll);
             // 
             // btnForward
             // 
@@ -193,6 +198,7 @@
             this.btnForward.TabIndex = 3;
             this.btnForward.Text = "F";
             this.btnForward.UseVisualStyleBackColor = true;
+            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
             // 
             // btnStop
             // 
@@ -203,6 +209,7 @@
             this.btnStop.TabIndex = 2;
             this.btnStop.Text = "S";
             this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // btnRewind
             // 
@@ -213,6 +220,7 @@
             this.btnRewind.TabIndex = 1;
             this.btnRewind.Text = "R";
             this.btnRewind.UseVisualStyleBackColor = true;
+            this.btnRewind.Click += new System.EventHandler(this.btnRewind_Click);
             // 
             // btnPlay
             // 
@@ -223,6 +231,7 @@
             this.btnPlay.TabIndex = 0;
             this.btnPlay.Text = "P";
             this.btnPlay.UseVisualStyleBackColor = true;
+            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 
             // lblElapsed
             // 
@@ -247,8 +256,9 @@
             this.tableLayoutPanel1.SetRowSpan(this.wmPlayer, 7);
             this.wmPlayer.Size = new System.Drawing.Size(794, 407);
             this.wmPlayer.TabIndex = 2;
+            this.wmPlayer.ClickEvent += new AxWMPLib._WMPOCXEvents_ClickEventHandler(this.wmPlayer_ClickEvent);
             // 
-            // frmMain
+            // MainGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -256,7 +266,7 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "frmMain";
+            this.Name = "MainGUI";
             this.Text = "JVP";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
