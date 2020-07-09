@@ -14,12 +14,14 @@ namespace JVP
     {
 
         private bool isPlaying;
+        private string fileName;
 
         public MainGUI()
         {
             InitializeComponent();
 
             isPlaying = false;
+            fileName = "";
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -46,7 +48,16 @@ namespace JVP
 
         private void mnuOpen_Click(object sender, EventArgs e)
         {
+            using (OpenFileDialog fd = new OpenFileDialog())
+            {
+                fd.Filter = "Video files (*.mp4)|*.mp4|All files (*.*)|*.*";
 
+                if(fd.ShowDialog() == DialogResult.OK)
+                {
+                    fileName = fd.FileName;
+                    wmPlayer.URL = fileName;
+                }
+            }
         }
 
         private void mnuExit_Click(object sender, EventArgs e)
@@ -71,7 +82,7 @@ namespace JVP
 
         private void wmPlayer_ClickEvent(object sender, AxWMPLib._WMPOCXEvents_ClickEvent e)
         {
-
+            btnPlay_Click(null, null);
         }
     }
 }
