@@ -12,14 +12,21 @@ namespace JVP
 {
     public partial class MainGUI : Form
     {
+
+        private bool isPlaying;
+
         public MainGUI()
         {
             InitializeComponent();
+
+            isPlaying = false;
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
-
+            if (isPlaying) wmPlayer.Ctlcontrols.pause();                
+            else wmPlayer.Ctlcontrols.play();
+            isPlaying = !isPlaying;
         }
 
         private void btnRewind_Click(object sender, EventArgs e)
@@ -44,7 +51,7 @@ namespace JVP
 
         private void mnuExit_Click(object sender, EventArgs e)
         {
-
+            this.Close();
         }
 
         private void mnuChapters_Click(object sender, EventArgs e)
