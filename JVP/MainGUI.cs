@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AudioSwitcher.AudioApi.CoreAudio;
 
 namespace JVP
 {
@@ -15,13 +16,23 @@ namespace JVP
 
         private bool isPlaying;
         private string fileName;
+        private CoreAudioDevice audioDevice;
+       
+               
+
+        private double volume { get; set; }
 
         public MainGUI()
         {
             InitializeComponent();
 
+            
+            audioDevice = new CoreAudioController().DefaultPlaybackDevice;
+            volume = audioDevice.Volume;
+            barVolume.Value = (int)volume;
             isPlaying = false;
             fileName = "";
+            
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -73,7 +84,7 @@ namespace JVP
 
         private void barVolume_Scroll(object sender, EventArgs e)
         {
-
+            
         }
 
         private void pbProgress_Click(object sender, EventArgs e)
@@ -85,5 +96,7 @@ namespace JVP
         {
             btnPlay_Click(null, null);
         }
+
+       
     }
 }
