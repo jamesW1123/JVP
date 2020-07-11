@@ -76,14 +76,14 @@
             // mnuOpen
             // 
             this.mnuOpen.Name = "mnuOpen";
-            this.mnuOpen.Size = new System.Drawing.Size(180, 22);
+            this.mnuOpen.Size = new System.Drawing.Size(103, 22);
             this.mnuOpen.Text = "Open";
             this.mnuOpen.Click += new System.EventHandler(this.mnuOpen_Click);
             // 
             // mnuExit
             // 
             this.mnuExit.Name = "mnuExit";
-            this.mnuExit.Size = new System.Drawing.Size(180, 22);
+            this.mnuExit.Size = new System.Drawing.Size(103, 22);
             this.mnuExit.Text = "Exit";
             this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
             // 
@@ -98,7 +98,7 @@
             // mnuChapters
             // 
             this.mnuChapters.Name = "mnuChapters";
-            this.mnuChapters.Size = new System.Drawing.Size(180, 22);
+            this.mnuChapters.Size = new System.Drawing.Size(121, 22);
             this.mnuChapters.Text = "Chapters";
             this.mnuChapters.Click += new System.EventHandler(this.mnuChapters_Click);
             // 
@@ -198,7 +198,8 @@
             this.btnForward.TabIndex = 3;
             this.btnForward.Text = "F";
             this.btnForward.UseVisualStyleBackColor = true;
-            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
+            this.btnForward.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseDown);
+            this.btnForward.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseUp);
             // 
             // btnStop
             // 
@@ -220,7 +221,8 @@
             this.btnRewind.TabIndex = 1;
             this.btnRewind.Text = "R";
             this.btnRewind.UseVisualStyleBackColor = true;
-            this.btnRewind.Click += new System.EventHandler(this.btnRewind_Click);
+            this.btnRewind.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnRewind_MouseDown);
+            this.btnRewind.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnRewind_MouseUp);
             // 
             // btnPlay
             // 
