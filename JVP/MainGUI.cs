@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AudioSwitcher.AudioApi.CoreAudio;
+using AudioSwitcher.AudioApi.Observables;
+using AudioSwitcher.AudioApi;
 
 namespace JVP
 {
@@ -17,8 +19,8 @@ namespace JVP
         private bool isPlaying;
         private string fileName;
         private CoreAudioDevice audioDevice;
+        Action<DeviceVolumeChangedArgs> onNext;
        
-               
 
         private double volume { get; set; }
 
@@ -26,14 +28,25 @@ namespace JVP
         {
             InitializeComponent();
 
-            
             audioDevice = new CoreAudioController().DefaultPlaybackDevice;
             volume = audioDevice.Volume;
             barVolume.Value = (int)volume;
             isPlaying = false;
             fileName = "";
+
+            onNext = delegate (DeviceVolumeChangedArgs args) { changeVolume(); };
+
+            IDisposable subscriber = ObservableExtensions.Subscribe<DeviceVolumeChangedArgs>(audioDevice.VolumeChanged, new Action<DeviceVolumeChangedArgs> (onNext));
             
         }
+
+        void changeVolume()
+        {
+            Console.Out.WriteLine(audioDevice.Volume);
+            //volume = audioDevice.Volume;
+            //barVolume.Value = (int)volume;
+        }
+       
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
@@ -97,6 +110,6 @@ namespace JVP
             btnPlay_Click(null, null);
         }
 
-       
+      
     }
 }
