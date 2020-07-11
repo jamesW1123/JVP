@@ -34,19 +34,11 @@ namespace JVP
             isPlaying = false;
             fileName = "";
 
-            onNext = delegate (DeviceVolumeChangedArgs args) { changeVolume(); };
+            onNext = delegate (DeviceVolumeChangedArgs args) { this.Invoke(new MethodInvoker(()=> barVolume.Value = (int)audioDevice.Volume)); };
 
             IDisposable subscriber = ObservableExtensions.Subscribe<DeviceVolumeChangedArgs>(audioDevice.VolumeChanged, new Action<DeviceVolumeChangedArgs> (onNext));
             
         }
-
-        void changeVolume()
-        {
-            Console.Out.WriteLine(audioDevice.Volume);
-            //volume = audioDevice.Volume;
-            //barVolume.Value = (int)volume;
-        }
-       
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
@@ -55,9 +47,14 @@ namespace JVP
             isPlaying = !isPlaying;
         }
 
-        private void btnRewind_Click(object sender, EventArgs e)
+        private void btnRewind_MouseDown(object sender, MouseEventArgs e)
         {
+            wmPlayer.Ctlcontrols.fastReverse();
+        }
 
+        private void btnRewind_MouseUp(object sender, MouseEventArgs e)
+        {
+            wmPlayer.Ctlcontrols.play();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -66,9 +63,14 @@ namespace JVP
             isPlaying = false;
         }
 
-        private void btnForward_Click(object sender, EventArgs e)
+        private void btnForward_MouseDown(object sender, MouseEventArgs e)
         {
+            wmPlayer.Ctlcontrols.fastForward();
+        }
 
+        private void btnForward_MouseUp(object sender, MouseEventArgs e)
+        {
+            wmPlayer.Ctlcontrols.play();
         }
 
         private void mnuOpen_Click(object sender, EventArgs e)
@@ -97,7 +99,8 @@ namespace JVP
 
         private void barVolume_Scroll(object sender, EventArgs e)
         {
-            
+            volume = barVolume.Value;
+            audioDevice.Volume = volume;
         }
 
         private void pbProgress_Click(object sender, EventArgs e)
@@ -110,6 +113,7 @@ namespace JVP
             btnPlay_Click(null, null);
         }
 
-      
+        
+       
     }
 }
