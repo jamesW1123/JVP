@@ -17,6 +17,7 @@ namespace JVP
     {
 
         private bool isPlaying;
+        private bool durationSet;
         private string fileName;
         private CoreAudioDevice audioDevice;
         Action<DeviceVolumeChangedArgs> onNext;
@@ -32,12 +33,13 @@ namespace JVP
             volume = audioDevice.Volume;
             barVolume.Value = (int)volume;
             isPlaying = false;
+            durationSet = false;
             fileName = "";
-
+            lblElapsed.Text = "00:00:00";
             onNext = delegate (DeviceVolumeChangedArgs args) { this.Invoke(new MethodInvoker(()=> barVolume.Value = (int)audioDevice.Volume)); };
 
             IDisposable subscriber = ObservableExtensions.Subscribe<DeviceVolumeChangedArgs>(audioDevice.VolumeChanged, new Action<DeviceVolumeChangedArgs> (onNext));
-            timer1.Start();
+           
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -77,14 +79,13 @@ namespace JVP
         {
             using (OpenFileDialog fd = new OpenFileDialog())
             {
-                fd.Filter = "Video files (*.mp4)|*.mp4|All files (*.*)|*.*";
+                fd.Filter = "Video files (*.mp4, *.avi)|*.mp4;*.avi|All files (*.*)|*.*";
 
                 if(fd.ShowDialog() == DialogResult.OK)
                 {
                     fileName = fd.FileName;
                     wmPlayer.URL = fileName;
-                    //sbProgress.Max = (int)wmPlayer.currentMedia.duration;
-                    //pbProgress.Maximum = (int)wmPlayer.currentMedia.duration;
+                    timer1.Start();
                 }
             }
         }
@@ -110,17 +111,30 @@ namespace JVP
             btnPlay_Click(null, null);
         }
 
+        private void setDuration()
+        {
+            if(!durationSet && wmPlayer.currentMedia != null && wmPlayer.currentMedia.duration > 0)
+            {
+                sbProgress.Max = (int)wmPlayer.currentMedia.duration;
+                lblTotal.Text = wmPlayer.currentMedia.durationString;              
+                if (sbProgress.Max > 0) durationSet = true;
+            } 
+        }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
+            setDuration();
             if(sbProgress.Max > 0)
             {
                 sbProgress.Value = (int)wmPlayer.Ctlcontrols.currentPosition;
                 sbProgress.SelLength = sbProgress.Value;
+                lblElapsed.Text = string.IsNullOrWhiteSpace(wmPlayer.Ctlcontrols.currentPositionString) ? "00:00:00" : wmPlayer.Ctlcontrols.currentPositionString;
             }
-            else if(wmPlayer.currentMedia != null)
-            {
-                sbProgress.Max = (int)wmPlayer.currentMedia.duration;
-            }
+            //else if(wmPlayer.currentMedia != null)
+            //{
+            //    sbProgress.Max = (int)wmPlayer.currentMedia.duration;
+            //    lblTotal.Text = wmPlayer.currentMedia.durationString;
+            //}
         }
     }
 }
