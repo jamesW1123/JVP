@@ -83,7 +83,8 @@ namespace JVP
                 {
                     fileName = fd.FileName;
                     wmPlayer.URL = fileName;
-                    pbProgress.Maximum = (int)wmPlayer.currentMedia.duration;
+                    //sbProgress.Max = (int)wmPlayer.currentMedia.duration;
+                    //pbProgress.Maximum = (int)wmPlayer.currentMedia.duration;
                 }
             }
         }
@@ -102,12 +103,7 @@ namespace JVP
         {
             volume = barVolume.Value;
             audioDevice.Volume = volume;
-        }
-
-        private void pbProgress_Click(object sender, EventArgs e)
-        {
-            
-        }
+        }      
 
         private void wmPlayer_ClickEvent(object sender, AxWMPLib._WMPOCXEvents_ClickEvent e)
         {
@@ -116,13 +112,14 @@ namespace JVP
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if(pbProgress.Maximum > 0)
+            if(sbProgress.Max > 0)
             {
-                pbProgress.Value = (int)wmPlayer.Ctlcontrols.currentPosition;
+                sbProgress.Value = (int)wmPlayer.Ctlcontrols.currentPosition;
+                sbProgress.SelLength = sbProgress.Value;
             }
             else if(wmPlayer.currentMedia != null)
             {
-                pbProgress.Maximum = (int)wmPlayer.currentMedia.duration;
+                sbProgress.Max = (int)wmPlayer.currentMedia.duration;
             }
         }
     }
