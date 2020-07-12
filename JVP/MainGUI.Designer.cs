@@ -46,8 +46,8 @@
             this.btnPlay = new System.Windows.Forms.Button();
             this.lblElapsed = new System.Windows.Forms.Label();
             this.wmPlayer = new AxWMPLib.AxWindowsMediaPlayer();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.sbProgress = new Axmscomctl.AxSlider();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -79,14 +79,14 @@
             // mnuOpen
             // 
             this.mnuOpen.Name = "mnuOpen";
-            this.mnuOpen.Size = new System.Drawing.Size(180, 22);
+            this.mnuOpen.Size = new System.Drawing.Size(103, 22);
             this.mnuOpen.Text = "Open";
             this.mnuOpen.Click += new System.EventHandler(this.mnuOpen_Click);
             // 
             // mnuExit
             // 
             this.mnuExit.Name = "mnuExit";
-            this.mnuExit.Size = new System.Drawing.Size(180, 22);
+            this.mnuExit.Size = new System.Drawing.Size(103, 22);
             this.mnuExit.Text = "Exit";
             this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
             // 
@@ -139,7 +139,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 478);
             this.tableLayoutPanel1.TabIndex = 2;
-            //           
+            // 
             // lblTotal
             // 
             this.lblTotal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -253,11 +253,6 @@
             this.wmPlayer.TabIndex = 2;
             this.wmPlayer.ClickEvent += new AxWMPLib._WMPOCXEvents_ClickEventHandler(this.wmPlayer_ClickEvent);
             // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            
-            // 
             // sbProgress
             // 
             this.sbProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -268,14 +263,10 @@
             this.sbProgress.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("sbProgress.OcxState")));
             this.sbProgress.Size = new System.Drawing.Size(688, 25);
             this.sbProgress.TabIndex = 3;
-            
             // 
-            // MainGUI
-            this.sbProgress.Margin = new System.Windows.Forms.Padding(0);
-            this.sbProgress.Name = "sbProgress";
-            this.sbProgress.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("sbProgress.OcxState")));
-            this.sbProgress.Size = new System.Drawing.Size(688, 25);
-            this.sbProgress.TabIndex = 3;
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // MainGUI
             // 
