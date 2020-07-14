@@ -129,12 +129,7 @@ namespace JVP
                 sbProgress.Value = (int)wmPlayer.Ctlcontrols.currentPosition;
                 sbProgress.SelLength = sbProgress.Value;
                 lblElapsed.Text = string.IsNullOrWhiteSpace(wmPlayer.Ctlcontrols.currentPositionString) ? "00:00:00" : wmPlayer.Ctlcontrols.currentPositionString;
-            }
-            //else if(wmPlayer.currentMedia != null)
-            //{
-            //    sbProgress.Max = (int)wmPlayer.currentMedia.duration;
-            //    lblTotal.Text = wmPlayer.currentMedia.durationString;
-            //}
+            }           
         }
     }
 }
