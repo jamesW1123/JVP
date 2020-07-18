@@ -182,7 +182,6 @@
             this.barVolume.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             this.barVolume.Scroll += new System.EventHandler(this.barVolume_Scroll);
             this.barVolume.MouseDown += new System.Windows.Forms.MouseEventHandler(this.barVolume_MouseDown);
-            this.barVolume.MouseUp += new System.Windows.Forms.MouseEventHandler(this.barVolume_MouseUp);
             // 
             // btnForward
             // 

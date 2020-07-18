@@ -2,6 +2,7 @@
 using AudioSwitcher.AudioApi.CoreAudio;
 using AudioSwitcher.AudioApi.Observables;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace JVP
@@ -34,10 +35,9 @@ namespace JVP
 
         private void barVolume_MouseDown(object sender, MouseEventArgs e)
         {
-        }
-
-        private void barVolume_MouseUp(object sender, MouseEventArgs e)
-        {
+            barVolume.Value = e.X;
+            volume = barVolume.Value;
+            audioDevice.Volume = volume;
         }
 
         private void barVolume_Scroll(object sender, EventArgs e)
