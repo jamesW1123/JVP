@@ -264,6 +264,9 @@
             this.sbProgress.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("sbProgress.OcxState")));
             this.sbProgress.Size = new System.Drawing.Size(688, 25);
             this.sbProgress.TabIndex = 3;
+            this.sbProgress.MouseDownEvent += new Axmscomctl.ISliderEvents_MouseDownEventHandler(this.sbProgress_MouseDownEvent);
+            this.sbProgress.MouseUpEvent += new Axmscomctl.ISliderEvents_MouseUpEventHandler(this.sbProgress_MouseUpEvent);
+            this.sbProgress.Scroll += new System.EventHandler(this.sbProgress_Scroll);
             // 
             // timer1
             // 

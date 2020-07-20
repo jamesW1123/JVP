@@ -128,5 +128,24 @@ namespace JVP
         {
             btnPlay_Click(null, null);
         }
+
+        private void sbProgress_MouseDownEvent(object sender, Axmscomctl.ISliderEvents_MouseDownEvent e)
+        {
+            sbProgress.Value = e.x;
+            Console.Out.WriteLine($"DOWN e.x: {e.x} sbProgress.Value: {sbProgress.Value} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
+            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
+
+        private void sbProgress_Scroll(object sender, EventArgs e)
+        {
+            //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
+
+        private void sbProgress_MouseUpEvent(object sender, Axmscomctl.ISliderEvents_MouseUpEvent e)
+        {
+            //sbProgress.Value = e.x;
+            //Console.Out.WriteLine($"UP e.x: {e.x} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
+            //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
     }
 }
