@@ -2,6 +2,7 @@
 using AudioSwitcher.AudioApi.CoreAudio;
 using AudioSwitcher.AudioApi.Observables;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -14,6 +15,7 @@ namespace JVP
         private string fileName;
         private bool isPlaying;
         private Action<DeviceVolumeChangedArgs> onNext;
+        private Dictionary<string, int> chapters = new Dictionary<string, int>();
 
         public MainGUI()
         {
@@ -45,7 +47,7 @@ namespace JVP
             volume = barVolume.Value;
             audioDevice.Volume = volume;
         }
-
+       
         private void btnForward_MouseDown(object sender, MouseEventArgs e)
         {
             wmPlayer.Ctlcontrols.fastForward();
@@ -131,14 +133,14 @@ namespace JVP
 
         private void sbProgress_MouseDownEvent(object sender, Axmscomctl.ISliderEvents_MouseDownEvent e)
         {
-            sbProgress.Value = e.x;
+            //sbProgress.Value = e.x;
             Console.Out.WriteLine($"DOWN e.x: {e.x} sbProgress.Value: {sbProgress.Value} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
             wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
         }
 
         private void sbProgress_Scroll(object sender, EventArgs e)
         {
-            //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
         }
 
         private void sbProgress_MouseUpEvent(object sender, Axmscomctl.ISliderEvents_MouseUpEvent e)
@@ -146,6 +148,11 @@ namespace JVP
             //sbProgress.Value = e.x;
             //Console.Out.WriteLine($"UP e.x: {e.x} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
             //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
+
+        private void btnMarkChapter_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

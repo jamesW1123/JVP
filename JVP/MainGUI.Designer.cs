@@ -48,6 +48,7 @@
             this.wmPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.sbProgress = new Axmscomctl.AxSlider();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btnMarkChapter = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -161,6 +162,7 @@
             this.tableLayoutPanel1.SetColumnSpan(this.panel1, 10);
             this.panel1.Controls.Add(this.barVolume);
             this.panel1.Controls.Add(this.btnForward);
+            this.panel1.Controls.Add(this.btnMarkChapter);
             this.panel1.Controls.Add(this.btnStop);
             this.panel1.Controls.Add(this.btnRewind);
             this.panel1.Controls.Add(this.btnPlay);
@@ -272,6 +274,17 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // btnMarkChapter
+            // 
+            this.btnMarkChapter.Location = new System.Drawing.Point(209, 7);
+            this.btnMarkChapter.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnMarkChapter.Name = "btnMarkChapter";
+            this.btnMarkChapter.Size = new System.Drawing.Size(25, 23);
+            this.btnMarkChapter.TabIndex = 4;
+            this.btnMarkChapter.Text = "M";
+            this.btnMarkChapter.UseVisualStyleBackColor = true;
+            this.btnMarkChapter.Click += new System.EventHandler(this.btnMarkChapter_Click);
+            // 
             // MainGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -314,6 +327,7 @@
         private System.Windows.Forms.TrackBar barVolume;
         private System.Windows.Forms.Timer timer1;
         private Axmscomctl.AxSlider sbProgress;
+        private System.Windows.Forms.Button btnMarkChapter;
     }
 }
 
