@@ -15,12 +15,13 @@ namespace JVP
         private string fileName;
         private bool isPlaying;
         private Action<DeviceVolumeChangedArgs> onNext;
-        private Dictionary<string, int> chapters = new Dictionary<string, int>();
+        private Dictionary<string, int> chapters;
 
         public MainGUI()
         {
             InitializeComponent();
-
+            chapters = new Dictionary<string, int>();
+            setChapters();
             audioDevice = new CoreAudioController().DefaultPlaybackDevice;
             volume = audioDevice.Volume;
             barVolume.Value = (int)volume;
@@ -153,6 +154,17 @@ namespace JVP
         private void btnMarkChapter_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void setChapters()
+        {
+            string[] lines = System.IO.File.ReadAllLines(@"D:\Repos\JVP\JVP\ref\chapters.txt");
+            
+            foreach(string s in lines)
+            {
+                string[] temp = s.Split('-');
+                chapters.Add(temp[0], Int32.Parse(temp[1]));
+            }
         }
     }
 }
