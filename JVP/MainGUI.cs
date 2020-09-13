@@ -15,13 +15,20 @@ namespace JVP
         private string fileName;
         private bool isPlaying;
         private Action<DeviceVolumeChangedArgs> onNext;
-        private Dictionary<string, int> chapters;
+        private Dictionary<string, Chapter> chapters;
+        
 
         public MainGUI()
         {
             InitializeComponent();
-            chapters = new Dictionary<string, int>();
+            chapters = new Dictionary<string, Chapter>();
+            //chapters = new List<Chapter>();
             setChapters();
+            foreach(KeyValuePair<string, Chapter> item in chapters)
+            {
+                Chapter c = item.Value;
+                Console.Out.WriteLine($"key: {item.Key}  index: {c.index}  label: {c.label}   value: {c.value}");
+            }
             audioDevice = new CoreAudioController().DefaultPlaybackDevice;
             volume = audioDevice.Volume;
             barVolume.Value = (int)volume;
@@ -162,9 +169,31 @@ namespace JVP
             
             foreach(string s in lines)
             {
-                string[] temp = s.Split('-');
-                chapters.Add(temp[0], Int32.Parse(temp[1]));
+                string[] temp = s.Split('~');
+                Chapter c = new Chapter(Int32.Parse(temp[0]), temp[1], Int32.Parse(temp[2]));
+                chapters.Add(c.label, c);
+                //chapters.Add(temp[0], Int32.Parse(temp[1]));
             }
+        }
+    }
+    class Chapter
+    {
+        public int index { get; set; }
+        public string label { get; set; }
+        public int value { get; set; }
+        
+        public Chapter()
+        {
+            index = 0;
+            label = "";
+            value = 0;
+        }
+
+        public Chapter(int index, string label, int value)
+        {
+            this.index = index;
+            this.label = label;
+            this.value = value;
         }
     }
 }
