@@ -12,6 +12,9 @@ namespace JVP
         private BinaryTree<Chapter> chapters;
         private ChapterMarkerStrip chapterMarkers;
         private ContextMenuStrip chapterContextMenu;
+        private ChapterStore chapterStore;
+        // Content hash of the open video; null until a video is opened
+        private string videoKey;
         // Set on a right mouse down so the jump on Click is skipped for that press
         private bool chapterItemRightClick;
         private bool durationSet;
@@ -35,14 +38,7 @@ namespace JVP
             chapterContextMenu.Items.Add("Delete", null, mnuDeleteChapter_Click);
             chapterContextMenu.Closed += chapterContextMenu_Closed;
             chapters = new BinaryTree<Chapter>();
-            setChapters();
-            renumberChapters();
-            updateChapterMarkers();
-            List<Chapter> temp = chapters.inorder();
-            foreach (Chapter item in temp)
-            {
-                Console.Out.WriteLine($"label: {item.label} value: {item.value}");
-            }
+            chapterStore = new ChapterStore();
             using (MMDeviceEnumerator enumerator = new MMDeviceEnumerator())
             {
                 audioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
@@ -96,6 +92,8 @@ namespace JVP
 
         private void btnMarkChapter_Click(object sender, EventArgs e)
         {
+            // Chapters are stored per video, so there's nothing to attach one to yet
+            if (videoKey == null) return;
             int value = (int)wmPlayer.Ctlcontrols.currentPosition;
             if (chapters.search(new Chapter("", value)))
             {
@@ -128,6 +126,7 @@ namespace JVP
             chapters.insert(new Chapter(label, value));
             renumberChapters();
             updateChapterMarkers();
+            saveChapters();
         }
 
         // Keep default "Chapter N" labels matching their position in time order; custom labels are left alone
@@ -155,6 +154,7 @@ namespace JVP
             chapters.delete((Chapter)((ToolStripItem)sender).Tag);
             renumberChapters();
             updateChapterMarkers();
+            saveChapters();
         }
 
         // The Edit menu can't be left open once its right-click menu has been up (it stops closing
@@ -205,17 +205,6 @@ namespace JVP
         {
             audioDevice.AudioEndpointVolume.OnVolumeNotification -= audioDevice_VolumeChanged;
             audioDevice.Dispose();
-
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"D:\Repos\JVP\JVP\ref\chapters.txt"))
-            {
-                string line = "";
-                List<Chapter> temp = chapters.inorder();
-                foreach (Chapter item in temp)
-                {
-                    line = item.label + "~" + item.value;
-                    file.WriteLine(line);
-                }
-            }
         }
 
         private void mnuChapters_Click(object sender, EventArgs e)
@@ -318,7 +307,17 @@ namespace JVP
 
                 if (fd.ShowDialog() == DialogResult.OK)
                 {
+                    try
+                    {
+                        videoKey = ChapterStore.keyFor(fd.FileName);
+                    }
+                    catch (Exception ex) when (ex is System.IO.IOException || ex is UnauthorizedAccessException)
+                    {
+                        MessageBox.Show($"Could not open {fd.FileName}: {ex.Message}", "Open");
+                        return;
+                    }
                     fileName = fd.FileName;
+                    loadChapters();
                     // Re-read the length for the new file so the bar and markers scale to it
                     durationSet = false;
                     updateChapterMarkers();
@@ -347,17 +346,26 @@ namespace JVP
             wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
         }
 
-        private void setChapters()
+        // Swap in the chapters saved for the video that was just opened
+        private void loadChapters()
         {
-            string[] lines = System.IO.File.ReadAllLines(@"D:\Repos\JVP\JVP\ref\chapters.txt");
-
-            foreach (string s in lines)
+            chapters = new BinaryTree<Chapter>();
+            foreach (Chapter c in chapterStore.getChapters(videoKey))
             {
-                if (String.IsNullOrWhiteSpace(s))
-                    continue;
-                string[] temp = s.Split('~');
-                Chapter c = new Chapter(temp[0], Int32.Parse(temp[1]));
                 chapters.insert(c);
+            }
+            renumberChapters();
+        }
+
+        private void saveChapters()
+        {
+            try
+            {
+                chapterStore.setChapters(videoKey, fileName, chapters.inorder());
+            }
+            catch (Exception ex) when (ex is System.IO.IOException || ex is UnauthorizedAccessException)
+            {
+                MessageBox.Show($"Could not save chapters: {ex.Message}", "Chapters");
             }
         }
 
