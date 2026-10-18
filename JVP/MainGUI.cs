@@ -13,6 +13,8 @@ namespace JVP
         private bool durationSet;
         private string fileName;
         private bool isPlaying;
+        // Ask for a label when marking a chapter; meant to become a settings option later
+        private bool promptForLabel = true;
         private double volume { get; set; }
 
         public MainGUI()
@@ -20,6 +22,7 @@ namespace JVP
             InitializeComponent();
             chapters = new BinaryTree<Chapter>();
             setChapters();
+            renumberChapters();
             List<Chapter> temp = chapters.inorder();
             foreach (Chapter item in temp)
             {
@@ -76,9 +79,47 @@ namespace JVP
         private void btnMarkChapter_Click(object sender, EventArgs e)
         {
             int value = (int)wmPlayer.Ctlcontrols.currentPosition;
-            string label = "Chapter " + (chapters.getSize() + 1);
-            Chapter c = new Chapter(label, value);
-            chapters.insert(c);
+            if (chapters.search(new Chapter("", value)))
+            {
+                MessageBox.Show("A chapter is already marked at this time.", "Mark Chapter");
+                return;
+            }
+
+            // Default number is where the new chapter falls in time order
+            int index = 1;
+            foreach (Chapter item in chapters.inorder())
+            {
+                if (item.value < value) index++;
+            }
+            string label = "Chapter " + index;
+
+            if (promptForLabel)
+            {
+                // Check the player itself; isPlaying misses autostart after opening a file
+                bool wasPlaying = wmPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying;
+                if (wasPlaying) wmPlayer.Ctlcontrols.pause();
+                using (ChapterLabelDialog dlg = new ChapterLabelDialog(label))
+                {
+                    DialogResult result = dlg.ShowDialog(this);
+                    if (wasPlaying) wmPlayer.Ctlcontrols.play();
+                    if (result != DialogResult.OK) return;
+                    if (dlg.label != "") label = dlg.label;
+                }
+            }
+
+            chapters.insert(new Chapter(label, value));
+            renumberChapters();
+        }
+
+        // Keep default "Chapter N" labels matching their position in time order; custom labels are left alone
+        private void renumberChapters()
+        {
+            List<Chapter> temp = chapters.inorder();
+            for (int i = 0; i < temp.Count; i++)
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(temp[i].label, @"^Chapter \d+$"))
+                    temp[i].label = "Chapter " + (i + 1);
+            }
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
