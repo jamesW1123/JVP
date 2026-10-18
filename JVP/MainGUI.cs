@@ -10,6 +10,10 @@ namespace JVP
     {
         private MMDevice audioDevice;
         private BinaryTree<Chapter> chapters;
+        private ChapterMarkerStrip chapterMarkers;
+        private ContextMenuStrip chapterContextMenu;
+        // Set on a right mouse down so the jump on Click is skipped for that press
+        private bool chapterItemRightClick;
         private bool durationSet;
         private string fileName;
         private bool isPlaying;
@@ -20,9 +24,20 @@ namespace JVP
         public MainGUI()
         {
             InitializeComponent();
+            // Chapter ticks sit in the thin spacer row just above the progress slider
+            chapterMarkers = new ChapterMarkerStrip(sbProgress) { Dock = DockStyle.Fill, Margin = new Padding(0) };
+            tableLayoutPanel1.RowStyles[7].Height = 7;
+            tableLayoutPanel1.Controls.Add(chapterMarkers, 1, 7);
+            tableLayoutPanel1.SetColumnSpan(chapterMarkers, 8);
+            chapterMarkers.chapterClicked += c => { if (wmPlayer.currentMedia != null) jumpTo(c.value); };
+            chapterMarkers.chapterRightClicked += showChapterContextMenu;
+            chapterContextMenu = new ContextMenuStrip();
+            chapterContextMenu.Items.Add("Delete", null, mnuDeleteChapter_Click);
+            chapterContextMenu.Closed += chapterContextMenu_Closed;
             chapters = new BinaryTree<Chapter>();
             setChapters();
             renumberChapters();
+            updateChapterMarkers();
             List<Chapter> temp = chapters.inorder();
             foreach (Chapter item in temp)
             {
@@ -112,6 +127,7 @@ namespace JVP
 
             chapters.insert(new Chapter(label, value));
             renumberChapters();
+            updateChapterMarkers();
         }
 
         // Keep default "Chapter N" labels matching their position in time order; custom labels are left alone
@@ -123,6 +139,43 @@ namespace JVP
                 if (System.Text.RegularExpressions.Regex.IsMatch(temp[i].label, @"^Chapter \d+$"))
                     temp[i].label = "Chapter " + (i + 1);
             }
+        }
+
+        // Shared by the marker strip and the Edit > Chapters list
+        private void showChapterContextMenu(Chapter c, System.Drawing.Point screenPos)
+        {
+            ToolStripItem item = chapterContextMenu.Items[0];
+            item.Text = "Delete " + c.label;
+            item.Tag = c;
+            chapterContextMenu.Show(screenPos);
+        }
+
+        private void mnuDeleteChapter_Click(object sender, EventArgs e)
+        {
+            chapters.delete((Chapter)((ToolStripItem)sender).Tag);
+            renumberChapters();
+            updateChapterMarkers();
+        }
+
+        // The Edit menu can't be left open once its right-click menu has been up (it stops closing
+        // on outside clicks), so close every menu whether Delete was picked or not
+        private void chapterContextMenu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
+        {
+            keepChapterMenuOpen(false);
+            editToolStripMenuItem.DropDown.Close();
+        }
+
+        // Stops Edit > Chapters closing while its right-click menu is up, like a normal context menu
+        private void keepChapterMenuOpen(bool keepOpen)
+        {
+            editToolStripMenuItem.DropDown.AutoClose = !keepOpen;
+            mnuChapters.DropDown.AutoClose = !keepOpen;
+        }
+
+        // Ticks only make sense once the video's length is known
+        private void updateChapterMarkers()
+        {
+            chapterMarkers.setChapters(chapters.inorder(), durationSet ? sbProgress.Max : 0);
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -172,6 +225,8 @@ namespace JVP
         // Rebuild the chapter list each time it opens so newly marked chapters show up
         private void mnuChapters_DropDownOpening(object sender, EventArgs e)
         {
+            chapterItemRightClick = false;
+            keepChapterMenuOpen(false);
             mnuChapters.DropDownItems.Clear();
             List<Chapter> temp = chapters.inorder();
             if (temp.Count == 0)
@@ -186,12 +241,32 @@ namespace JVP
                 mnuItem.Tag = item;
                 mnuItem.Enabled = hasMedia;
                 mnuItem.Click += mnuChapterItem_Click;
+                mnuItem.MouseDown += mnuChapterItem_MouseDown;
+                mnuItem.MouseUp += mnuChapterItem_MouseUp;
                 mnuChapters.DropDownItems.Add(mnuItem);
             }
         }
 
+        private void mnuChapterItem_MouseDown(object sender, MouseEventArgs e)
+        {
+            chapterItemRightClick = e.Button == MouseButtons.Right;
+            // Set before the button comes up, or the right-click would close the menus
+            if (chapterItemRightClick) keepChapterMenuOpen(true);
+        }
+
+        private void mnuChapterItem_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+            showChapterContextMenu((Chapter)((ToolStripMenuItem)sender).Tag, Cursor.Position);
+        }
+
         private void mnuChapterItem_Click(object sender, EventArgs e)
         {
+            if (chapterItemRightClick)
+            {
+                chapterItemRightClick = false;
+                return;
+            }
             Chapter c = (Chapter)((ToolStripMenuItem)sender).Tag;
             jumpTo(c.value);
         }
@@ -244,6 +319,9 @@ namespace JVP
                 if (fd.ShowDialog() == DialogResult.OK)
                 {
                     fileName = fd.FileName;
+                    // Re-read the length for the new file so the bar and markers scale to it
+                    durationSet = false;
+                    updateChapterMarkers();
                     wmPlayer.URL = fileName;
                     timer1.Start();
                 }
@@ -290,6 +368,7 @@ namespace JVP
                 sbProgress.Max = (int)wmPlayer.currentMedia.duration;
                 lblTotal.Text = wmPlayer.currentMedia.durationString;
                 if (sbProgress.Max > 0) durationSet = true;
+                updateChapterMarkers();
             }
         }
 
