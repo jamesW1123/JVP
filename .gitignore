@@ -1,0 +1,20 @@
+# Visual Studio user and cache files
+.vs/
+*.suo
+*.user
+
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# NuGet packages (restored from packages.config)
+packages/
+*.nupkg
+
+# Merge leftovers
+*.orig
+
+# Project specific
+/JVP/Form1.resx
+/JVP/frmMain.resx
+/JVP/ref/chapters.txt
