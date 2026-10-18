@@ -1,7 +1,5 @@
-﻿using AudioSwitcher.AudioApi;
-using AudioSwitcher.AudioApi.CoreAudio;
-using AudioSwitcher.AudioApi.Observables;
-using JLib;
+﻿using JLib;
+using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -10,12 +8,11 @@ namespace JVP
 {
     public partial class MainGUI : Form
     {
-        private CoreAudioDevice audioDevice;
+        private MMDevice audioDevice;
         private BinaryTree<Chapter> chapters;
         private bool durationSet;
         private string fileName;
         private bool isPlaying;
-        private Action<DeviceVolumeChangedArgs> onNext;
         private double volume { get; set; }
 
         public MainGUI()
@@ -28,29 +25,42 @@ namespace JVP
             {
                 Console.Out.WriteLine($"label: {item.label} value: {item.value}");
             }
-            audioDevice = new CoreAudioController().DefaultPlaybackDevice;
-            volume = audioDevice.Volume;
+            using (MMDeviceEnumerator enumerator = new MMDeviceEnumerator())
+            {
+                audioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            }
+            volume = Math.Round(audioDevice.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
             barVolume.Value = (int)volume;
             isPlaying = false;
             durationSet = false;
             fileName = "";
             lblElapsed.Text = "00:00:00";
-            onNext = delegate (DeviceVolumeChangedArgs args) { this.Invoke(new MethodInvoker(() => barVolume.Value = (int)audioDevice.Volume)); };
+            audioDevice.AudioEndpointVolume.OnVolumeNotification += audioDevice_VolumeChanged;
+        }
 
-            IDisposable subscriber = ObservableExtensions.Subscribe<DeviceVolumeChangedArgs>(audioDevice.VolumeChanged, new Action<DeviceVolumeChangedArgs>(onNext));
+        // Raised on a Windows audio thread, so marshal back to the UI thread
+        private void audioDevice_VolumeChanged(AudioVolumeNotificationData data)
+        {
+            if (!IsHandleCreated) return;
+            BeginInvoke(new MethodInvoker(() => barVolume.Value = (int)Math.Round(data.MasterVolume * 100)));
+        }
+
+        private void setDeviceVolume()
+        {
+            audioDevice.AudioEndpointVolume.MasterVolumeLevelScalar = (float)(volume / 100);
         }
 
         private void barVolume_MouseDown(object sender, MouseEventArgs e)
         {
             barVolume.Value = e.X;
             volume = barVolume.Value;
-            audioDevice.Volume = volume;
+            setDeviceVolume();
         }
 
         private void barVolume_Scroll(object sender, EventArgs e)
         {
             volume = barVolume.Value;
-            audioDevice.Volume = volume;
+            setDeviceVolume();
         }
 
         private void btnForward_MouseDown(object sender, MouseEventArgs e)
@@ -96,6 +106,9 @@ namespace JVP
 
         private void MainGUI_FormClosing(object sender, FormClosingEventArgs e)
         {
+            audioDevice.AudioEndpointVolume.OnVolumeNotification -= audioDevice_VolumeChanged;
+            audioDevice.Dispose();
+
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"D:\Repos\JVP\JVP\ref\chapters.txt"))
             {
                 string line = "";
