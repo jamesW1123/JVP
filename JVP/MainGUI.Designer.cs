@@ -41,6 +41,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.barVolume = new System.Windows.Forms.TrackBar();
             this.btnForward = new System.Windows.Forms.Button();
+            this.btnMarkChapter = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnRewind = new System.Windows.Forms.Button();
             this.btnPlay = new System.Windows.Forms.Button();
@@ -48,7 +49,6 @@
             this.wmPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.sbProgress = new Axmscomctl.AxSlider();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.btnMarkChapter = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -197,6 +197,17 @@
             this.btnForward.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseDown);
             this.btnForward.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseUp);
             // 
+            // btnMarkChapter
+            // 
+            this.btnMarkChapter.Location = new System.Drawing.Point(209, 7);
+            this.btnMarkChapter.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnMarkChapter.Name = "btnMarkChapter";
+            this.btnMarkChapter.Size = new System.Drawing.Size(25, 23);
+            this.btnMarkChapter.TabIndex = 4;
+            this.btnMarkChapter.Text = "M";
+            this.btnMarkChapter.UseVisualStyleBackColor = true;
+            this.btnMarkChapter.Click += new System.EventHandler(this.btnMarkChapter_Click);
+            // 
             // btnStop
             // 
             this.btnStop.Location = new System.Drawing.Point(73, 7);
@@ -274,17 +285,6 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // btnMarkChapter
-            // 
-            this.btnMarkChapter.Location = new System.Drawing.Point(209, 7);
-            this.btnMarkChapter.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.btnMarkChapter.Name = "btnMarkChapter";
-            this.btnMarkChapter.Size = new System.Drawing.Size(25, 23);
-            this.btnMarkChapter.TabIndex = 4;
-            this.btnMarkChapter.Text = "M";
-            this.btnMarkChapter.UseVisualStyleBackColor = true;
-            this.btnMarkChapter.Click += new System.EventHandler(this.btnMarkChapter_Click);
-            // 
             // MainGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -295,6 +295,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainGUI";
             this.Text = "JVP";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainGUI_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);

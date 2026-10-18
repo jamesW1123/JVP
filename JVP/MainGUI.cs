@@ -1,9 +1,9 @@
 ﻿using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.CoreAudio;
 using AudioSwitcher.AudioApi.Observables;
+using JLib;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace JVP
@@ -11,23 +11,22 @@ namespace JVP
     public partial class MainGUI : Form
     {
         private CoreAudioDevice audioDevice;
+        private BinaryTree<Chapter> chapters;
         private bool durationSet;
         private string fileName;
         private bool isPlaying;
         private Action<DeviceVolumeChangedArgs> onNext;
-        private Dictionary<string, Chapter> chapters;
-        
+        private double volume { get; set; }
 
         public MainGUI()
         {
             InitializeComponent();
-            chapters = new Dictionary<string, Chapter>();
-            //chapters = new List<Chapter>();
+            chapters = new BinaryTree<Chapter>();
             setChapters();
-            foreach(KeyValuePair<string, Chapter> item in chapters)
+            List<Chapter> temp = chapters.inorder();
+            foreach (Chapter item in temp)
             {
-                Chapter c = item.Value;
-                Console.Out.WriteLine($"key: {item.Key}  index: {c.index}  label: {c.label}   value: {c.value}");
+                Console.Out.WriteLine($"label: {item.label} value: {item.value}");
             }
             audioDevice = new CoreAudioController().DefaultPlaybackDevice;
             volume = audioDevice.Volume;
@@ -41,8 +40,6 @@ namespace JVP
             IDisposable subscriber = ObservableExtensions.Subscribe<DeviceVolumeChangedArgs>(audioDevice.VolumeChanged, new Action<DeviceVolumeChangedArgs>(onNext));
         }
 
-        private double volume { get; set; }
-
         private void barVolume_MouseDown(object sender, MouseEventArgs e)
         {
             barVolume.Value = e.X;
@@ -55,7 +52,7 @@ namespace JVP
             volume = barVolume.Value;
             audioDevice.Volume = volume;
         }
-       
+
         private void btnForward_MouseDown(object sender, MouseEventArgs e)
         {
             wmPlayer.Ctlcontrols.fastForward();
@@ -64,6 +61,14 @@ namespace JVP
         private void btnForward_MouseUp(object sender, MouseEventArgs e)
         {
             wmPlayer.Ctlcontrols.play();
+        }
+
+        private void btnMarkChapter_Click(object sender, EventArgs e)
+        {
+            int value = (int)wmPlayer.Ctlcontrols.currentPosition;
+            string label = "Chapter " + (chapters.getSize() + 1);
+            Chapter c = new Chapter(label, value);
+            chapters.insert(c);
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -89,6 +94,20 @@ namespace JVP
             isPlaying = false;
         }
 
+        private void MainGUI_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"D:\Repos\JVP\JVP\ref\chapters.txt"))
+            {
+                string line = "";
+                List<Chapter> temp = chapters.inorder();
+                foreach (Chapter item in temp)
+                {
+                    line = item.label + "~" + item.value;
+                    file.WriteLine(line);
+                }
+            }
+        }
+
         private void mnuChapters_Click(object sender, EventArgs e)
         {
         }
@@ -110,6 +129,39 @@ namespace JVP
                     wmPlayer.URL = fileName;
                     timer1.Start();
                 }
+            }
+        }
+
+        private void sbProgress_MouseDownEvent(object sender, Axmscomctl.ISliderEvents_MouseDownEvent e)
+        {
+            //sbProgress.Value = e.x;
+            Console.Out.WriteLine($"DOWN e.x: {e.x} sbProgress.Value: {sbProgress.Value} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
+            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
+
+        private void sbProgress_MouseUpEvent(object sender, Axmscomctl.ISliderEvents_MouseUpEvent e)
+        {
+            //sbProgress.Value = e.x;
+            //Console.Out.WriteLine($"UP e.x: {e.x} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
+            //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
+
+        private void sbProgress_Scroll(object sender, EventArgs e)
+        {
+            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+        }
+
+        private void setChapters()
+        {
+            string[] lines = System.IO.File.ReadAllLines(@"D:\Repos\JVP\JVP\ref\chapters.txt");
+
+            foreach (string s in lines)
+            {
+                if (String.IsNullOrWhiteSpace(s))
+                    continue;
+                string[] temp = s.Split('~');
+                Chapter c = new Chapter(temp[0], Int32.Parse(temp[1]));
+                chapters.insert(c);
             }
         }
 
@@ -138,62 +190,30 @@ namespace JVP
         {
             btnPlay_Click(null, null);
         }
-
-        private void sbProgress_MouseDownEvent(object sender, Axmscomctl.ISliderEvents_MouseDownEvent e)
-        {
-            //sbProgress.Value = e.x;
-            Console.Out.WriteLine($"DOWN e.x: {e.x} sbProgress.Value: {sbProgress.Value} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
-            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
-        }
-
-        private void sbProgress_Scroll(object sender, EventArgs e)
-        {
-            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
-        }
-
-        private void sbProgress_MouseUpEvent(object sender, Axmscomctl.ISliderEvents_MouseUpEvent e)
-        {
-            //sbProgress.Value = e.x;
-            //Console.Out.WriteLine($"UP e.x: {e.x} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
-            //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
-        }
-
-        private void btnMarkChapter_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void setChapters()
-        {
-            string[] lines = System.IO.File.ReadAllLines(@"D:\Repos\JVP\JVP\ref\chapters.txt");
-            
-            foreach(string s in lines)
-            {
-                string[] temp = s.Split('~');
-                Chapter c = new Chapter(Int32.Parse(temp[0]), temp[1], Int32.Parse(temp[2]));
-                chapters.Add(c.label, c);
-                //chapters.Add(temp[0], Int32.Parse(temp[1]));
-            }
-        }
     }
-    class Chapter
+
+    internal class Chapter : IComparable<Chapter>
     {
-        public int index { get; set; }
+        //public int index { get; set; }
         public string label { get; set; }
+
         public int value { get; set; }
-        
+
         public Chapter()
         {
-            index = 0;
             label = "";
             value = 0;
         }
 
-        public Chapter(int index, string label, int value)
+        public Chapter(string label, int value)
         {
-            this.index = index;
             this.label = label;
             this.value = value;
+        }
+
+        public int CompareTo(Chapter other)
+        {
+            return value.CompareTo(other.value);
         }
     }
 }
