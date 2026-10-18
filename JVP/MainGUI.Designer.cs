@@ -41,6 +41,8 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.barVolume = new System.Windows.Forms.TrackBar();
             this.btnForward = new System.Windows.Forms.Button();
+            this.btnPrevChapter = new System.Windows.Forms.Button();
+            this.btnNextChapter = new System.Windows.Forms.Button();
             this.btnMarkChapter = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnRewind = new System.Windows.Forms.Button();
@@ -162,6 +164,8 @@
             this.tableLayoutPanel1.SetColumnSpan(this.panel1, 10);
             this.panel1.Controls.Add(this.barVolume);
             this.panel1.Controls.Add(this.btnForward);
+            this.panel1.Controls.Add(this.btnPrevChapter);
+            this.panel1.Controls.Add(this.btnNextChapter);
             this.panel1.Controls.Add(this.btnMarkChapter);
             this.panel1.Controls.Add(this.btnStop);
             this.panel1.Controls.Add(this.btnRewind);
@@ -196,6 +200,28 @@
             this.btnForward.UseVisualStyleBackColor = true;
             this.btnForward.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseDown);
             this.btnForward.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseUp);
+            // 
+            // btnPrevChapter
+            // 
+            this.btnPrevChapter.Location = new System.Drawing.Point(135, 7);
+            this.btnPrevChapter.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnPrevChapter.Name = "btnPrevChapter";
+            this.btnPrevChapter.Size = new System.Drawing.Size(25, 23);
+            this.btnPrevChapter.TabIndex = 5;
+            this.btnPrevChapter.Text = "|<";
+            this.btnPrevChapter.UseVisualStyleBackColor = true;
+            this.btnPrevChapter.Click += new System.EventHandler(this.btnPrevChapter_Click);
+            // 
+            // btnNextChapter
+            // 
+            this.btnNextChapter.Location = new System.Drawing.Point(166, 7);
+            this.btnNextChapter.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.btnNextChapter.Name = "btnNextChapter";
+            this.btnNextChapter.Size = new System.Drawing.Size(25, 23);
+            this.btnNextChapter.TabIndex = 6;
+            this.btnNextChapter.Text = ">|";
+            this.btnNextChapter.UseVisualStyleBackColor = true;
+            this.btnNextChapter.Click += new System.EventHandler(this.btnNextChapter_Click);
             // 
             // btnMarkChapter
             // 
@@ -329,6 +355,8 @@
         private System.Windows.Forms.Timer timer1;
         private Axmscomctl.AxSlider sbProgress;
         private System.Windows.Forms.Button btnMarkChapter;
+        private System.Windows.Forms.Button btnPrevChapter;
+        private System.Windows.Forms.Button btnNextChapter;
     }
 }
 

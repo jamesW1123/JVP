@@ -36,6 +36,9 @@ namespace JVP
             fileName = "";
             lblElapsed.Text = "00:00:00";
             audioDevice.AudioEndpointVolume.OnVolumeNotification += audioDevice_VolumeChanged;
+            // A placeholder child makes Chapters a submenu; the real list is built on open
+            mnuChapters.DropDownItems.Add("(no chapters)");
+            mnuChapters.DropDownOpening += mnuChapters_DropDownOpening;
         }
 
         // Raised on a Windows audio thread, so marshal back to the UI thread
@@ -123,6 +126,67 @@ namespace JVP
 
         private void mnuChapters_Click(object sender, EventArgs e)
         {
+        }
+
+        // Rebuild the chapter list each time it opens so newly marked chapters show up
+        private void mnuChapters_DropDownOpening(object sender, EventArgs e)
+        {
+            mnuChapters.DropDownItems.Clear();
+            List<Chapter> temp = chapters.inorder();
+            if (temp.Count == 0)
+            {
+                mnuChapters.DropDownItems.Add(new ToolStripMenuItem("(no chapters)") { Enabled = false });
+                return;
+            }
+            bool hasMedia = wmPlayer.currentMedia != null;
+            foreach (Chapter item in temp)
+            {
+                ToolStripMenuItem mnuItem = new ToolStripMenuItem($"{item.label}  ({item.displayTime})");
+                mnuItem.Tag = item;
+                mnuItem.Enabled = hasMedia;
+                mnuItem.Click += mnuChapterItem_Click;
+                mnuChapters.DropDownItems.Add(mnuItem);
+            }
+        }
+
+        private void mnuChapterItem_Click(object sender, EventArgs e)
+        {
+            Chapter c = (Chapter)((ToolStripMenuItem)sender).Tag;
+            jumpTo(c.value);
+        }
+
+        // Within the first 2 seconds of a chapter, go to the one before it instead of restarting it
+        private void btnPrevChapter_Click(object sender, EventArgs e)
+        {
+            if (wmPlayer.currentMedia == null) return;
+            double position = wmPlayer.Ctlcontrols.currentPosition;
+            int target = 0;
+            foreach (Chapter item in chapters.inorder())
+            {
+                if (item.value < position - 2) target = item.value;
+                else break;
+            }
+            jumpTo(target);
+        }
+
+        private void btnNextChapter_Click(object sender, EventArgs e)
+        {
+            if (wmPlayer.currentMedia == null) return;
+            double position = wmPlayer.Ctlcontrols.currentPosition;
+            foreach (Chapter item in chapters.inorder())
+            {
+                if (item.value > position)
+                {
+                    jumpTo(item.value);
+                    return;
+                }
+            }
+        }
+
+        private void jumpTo(int seconds)
+        {
+            wmPlayer.Ctlcontrols.currentPosition = seconds;
+            if (sbProgress.Max > 0) sbProgress.Value = Math.Min(seconds, sbProgress.Max);
         }
 
         private void mnuExit_Click(object sender, EventArgs e)
@@ -222,6 +286,18 @@ namespace JVP
         {
             this.label = label;
             this.value = value;
+        }
+
+        // Display only: hh:mm:ss when there are hours, otherwise mm:ss. The file still stores seconds.
+        public string displayTime
+        {
+            get
+            {
+                TimeSpan t = TimeSpan.FromSeconds(value);
+                return t.TotalHours >= 1
+                    ? $"{(int)t.TotalHours:00}:{t.Minutes:00}:{t.Seconds:00}"
+                    : $"{t.Minutes:00}:{t.Seconds:00}";
+            }
         }
 
         public int CompareTo(Chapter other)
