@@ -29,6 +29,16 @@ namespace JVP
         // Ask for a label when marking a chapter; meant to become a settings option later
         private bool promptForLabel = true;
         private double volume { get; set; }
+        // Fast-forward and rewind speeds; each click on the button steps to the next one
+        private static readonly int[] shuttleSpeeds = { 2, 4, 8 };
+        // Index into shuttleSpeeds while fast-forwarding or rewinding, -1 at normal speed
+        private int shuttleStep = -1;
+        private bool rewinding;
+        // Fastest rate the player reliably plays at; it silently drops back to normal speed above this
+        private const int maxPlayRate = 4;
+        // Rewind, and fast-forward above maxPlayRate, seek in steps while paused instead.
+        // Most video formats can't play in reverse at all.
+        private readonly Timer stepTimer = new Timer { Interval = 200 };
 
         public MainGUI()
         {
@@ -59,6 +69,7 @@ namespace JVP
             // A placeholder child makes Chapters a submenu; the real list is built on open
             mnuChapters.DropDownItems.Add("(no chapters)");
             mnuChapters.DropDownOpening += mnuChapters_DropDownOpening;
+            stepTimer.Tick += stepTimer_Tick;
         }
 
         // Raised on a Windows audio thread, so marshal back to the UI thread
@@ -86,14 +97,9 @@ namespace JVP
             setDeviceVolume();
         }
 
-        private void btnForward_MouseDown(object sender, MouseEventArgs e)
+        private void btnForward_Click(object sender, EventArgs e)
         {
-            wmPlayer.Ctlcontrols.fastForward();
-        }
-
-        private void btnForward_MouseUp(object sender, MouseEventArgs e)
-        {
-            wmPlayer.Ctlcontrols.play();
+            shuttle(false);
         }
 
         private void btnMarkChapter_Click(object sender, EventArgs e)
@@ -186,23 +192,77 @@ namespace JVP
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
+            // Play while fast-forwarding or rewinding goes back to normal speed rather than pausing
+            if (shuttleStep >= 0)
+            {
+                stopShuttle();
+                wmPlayer.Ctlcontrols.play();
+                isPlaying = true;
+                return;
+            }
             if (isPlaying) wmPlayer.Ctlcontrols.pause();
             else wmPlayer.Ctlcontrols.play();
             isPlaying = !isPlaying;
         }
 
-        private void btnRewind_MouseDown(object sender, MouseEventArgs e)
+        private void btnRewind_Click(object sender, EventArgs e)
         {
-            wmPlayer.Ctlcontrols.fastReverse();
+            shuttle(true);
         }
 
-        private void btnRewind_MouseUp(object sender, MouseEventArgs e)
+        // Steps through the speeds in one direction, wrapping back to the slowest.
+        // Switching direction starts again at the slowest speed.
+        private void shuttle(bool rewind)
         {
+            if (wmPlayer.currentMedia == null) return;
+            shuttleStep = shuttleStep >= 0 && rewinding == rewind ? (shuttleStep + 1) % shuttleSpeeds.Length : 0;
+            rewinding = rewind;
+            int speed = shuttleSpeeds[shuttleStep];
+            if (rewind || speed > maxPlayRate)
+            {
+                wmPlayer.settings.rate = 1;
+                wmPlayer.Ctlcontrols.pause();
+                stepTimer.Start();
+            }
+            else
+            {
+                stepTimer.Stop();
+                wmPlayer.settings.rate = speed;
+                wmPlayer.Ctlcontrols.play();
+            }
+            isPlaying = true;
+            btnRewind.Text = rewind ? speed + "x" : "R";
+            btnForward.Text = rewind ? "F" : speed + "x";
+        }
+
+        private void stopShuttle()
+        {
+            shuttleStep = -1;
+            stepTimer.Stop();
+            wmPlayer.settings.rate = 1;
+            btnRewind.Text = "R";
+            btnForward.Text = "F";
+        }
+
+        private void stepTimer_Tick(object sender, EventArgs e)
+        {
+            double step = shuttleSpeeds[shuttleStep] * stepTimer.Interval / 1000.0;
+            double target = wmPlayer.Ctlcontrols.currentPosition + (rewinding ? -step : step);
+            double end = wmPlayer.currentMedia.duration;
+            if (target > 0 && target < end)
+            {
+                wmPlayer.Ctlcontrols.currentPosition = target;
+                return;
+            }
+            // Reached the start or end: carry on playing from there at normal speed
+            stopShuttle();
+            wmPlayer.Ctlcontrols.currentPosition = rewinding ? 0 : Math.Max(0, end - 1);
             wmPlayer.Ctlcontrols.play();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            stopShuttle();
             wmPlayer.Ctlcontrols.stop();
             isPlaying = false;
         }
@@ -327,6 +387,7 @@ namespace JVP
                     // Re-read the length for the new file so the bar and markers scale to it
                     durationSet = false;
                     updateChapterMarkers();
+                    stopShuttle();
                     wmPlayer.URL = fileName;
                     timer1.Start();
                 }
@@ -396,6 +457,12 @@ namespace JVP
         private void timer1_Tick(object sender, EventArgs e)
         {
             setDuration();
+            // Fast-forwarding into the end stops the video; drop back to normal speed for next time
+            if (shuttleStep >= 0 && !rewinding && (wmPlayer.playState == WMPLib.WMPPlayState.wmppsStopped || wmPlayer.playState == WMPLib.WMPPlayState.wmppsMediaEnded))
+            {
+                stopShuttle();
+                isPlaying = false;
+            }
             if (sbProgress.Max > 0 && !seeking)
             {
                 sbProgress.Value = (int)wmPlayer.Ctlcontrols.currentPosition;
