@@ -319,7 +319,6 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainGUI";
             this.Text = "JVP";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainGUI_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
