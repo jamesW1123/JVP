@@ -1,5 +1,4 @@
 ﻿using JLib;
-using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,7 +8,6 @@ namespace JVP
 {
     public partial class MainGUI : Form
     {
-        private MMDevice audioDevice;
         private BinaryTree<Chapter> chapters;
         private ChapterMarkerStrip chapterMarkers;
         private ContextMenuStrip chapterContextMenu;
@@ -28,7 +26,6 @@ namespace JVP
         private bool isPlaying;
         // Ask for a label when marking a chapter; meant to become a settings option later
         private bool promptForLabel = true;
-        private double volume { get; set; }
         // Fast-forward and rewind speeds; each click on the button steps to the next one
         private static readonly int[] shuttleSpeeds = { 2, 4, 8 };
         // Index into shuttleSpeeds while fast-forwarding or rewinding, -1 at normal speed
@@ -55,46 +52,27 @@ namespace JVP
             chapterContextMenu.Closed += chapterContextMenu_Closed;
             chapters = new BinaryTree<Chapter>();
             chapterStore = new ChapterStore();
-            using (MMDeviceEnumerator enumerator = new MMDeviceEnumerator())
-            {
-                audioDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            }
-            volume = Math.Round(audioDevice.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
-            barVolume.Value = (int)volume;
+            // The player keeps its own volume, separate from the Windows volume
+            barVolume.Value = Math.Max(barVolume.Minimum, Math.Min(barVolume.Maximum, wmPlayer.settings.volume));
             isPlaying = false;
             durationSet = false;
             fileName = "";
             lblElapsed.Text = Chapter.formatTime(0);
-            audioDevice.AudioEndpointVolume.OnVolumeNotification += audioDevice_VolumeChanged;
             // A placeholder child makes Chapters a submenu; the real list is built on open
             mnuChapters.DropDownItems.Add("(no chapters)");
             mnuChapters.DropDownOpening += mnuChapters_DropDownOpening;
             stepTimer.Tick += stepTimer_Tick;
         }
 
-        // Raised on a Windows audio thread, so marshal back to the UI thread
-        private void audioDevice_VolumeChanged(AudioVolumeNotificationData data)
-        {
-            if (!IsHandleCreated) return;
-            BeginInvoke(new MethodInvoker(() => barVolume.Value = (int)Math.Round(data.MasterVolume * 100)));
-        }
-
-        private void setDeviceVolume()
-        {
-            audioDevice.AudioEndpointVolume.MasterVolumeLevelScalar = (float)(volume / 100);
-        }
-
         private void barVolume_MouseDown(object sender, MouseEventArgs e)
         {
             barVolume.Value = e.X;
-            volume = barVolume.Value;
-            setDeviceVolume();
+            wmPlayer.settings.volume = barVolume.Value;
         }
 
         private void barVolume_Scroll(object sender, EventArgs e)
         {
-            volume = barVolume.Value;
-            setDeviceVolume();
+            wmPlayer.settings.volume = barVolume.Value;
         }
 
         private void btnForward_Click(object sender, EventArgs e)
@@ -265,12 +243,6 @@ namespace JVP
             stopShuttle();
             wmPlayer.Ctlcontrols.stop();
             isPlaying = false;
-        }
-
-        private void MainGUI_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            audioDevice.AudioEndpointVolume.OnVolumeNotification -= audioDevice_VolumeChanged;
-            audioDevice.Dispose();
         }
 
         private void mnuChapters_Click(object sender, EventArgs e)
