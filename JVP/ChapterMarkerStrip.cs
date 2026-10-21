@@ -93,6 +93,16 @@ namespace JVP
             tip.Hide(this);
         }
 
+        // Seconds under a screen point on the slider's track, for a slider running 0..max
+        public int secondsAt(Point screen, int max)
+        {
+            int left, right;
+            getTrack(out left, out right);
+            if (max <= 0 || right <= left) return 0;
+            double fraction = (PointToClient(screen).X - left) / (double)(right - left);
+            return (int)Math.Round(Math.Max(0, Math.Min(1, fraction)) * max);
+        }
+
         // Nearest chapter within a few pixels of x, so a thin tick is easy to hover and click
         private Chapter chapterAt(int x)
         {

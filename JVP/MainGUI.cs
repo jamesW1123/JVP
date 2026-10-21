@@ -2,6 +2,7 @@
 using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace JVP
@@ -18,6 +19,11 @@ namespace JVP
         // Set on a right mouse down so the jump on Click is skipped for that press
         private bool chapterItemRightClick;
         private bool durationSet;
+        // True while the left button is held on the progress bar, so the timer leaves the bar alone
+        private bool seeking;
+        private int seekStartX;
+        // Pixels the mouse may move between press and release and still count as a click
+        private const int clickSlop = 3;
         private string fileName;
         private bool isPlaying;
         // Ask for a label when marking a chapter; meant to become a settings option later
@@ -48,7 +54,7 @@ namespace JVP
             isPlaying = false;
             durationSet = false;
             fileName = "";
-            lblElapsed.Text = "00:00:00";
+            lblElapsed.Text = Chapter.formatTime(0);
             audioDevice.AudioEndpointVolume.OnVolumeNotification += audioDevice_VolumeChanged;
             // A placeholder child makes Chapters a submenu; the real list is built on open
             mnuChapters.DropDownItems.Add("(no chapters)");
@@ -327,23 +333,30 @@ namespace JVP
             }
         }
 
+        // Left button held on the progress bar: the bar follows the mouse and we seek once on release
         private void sbProgress_MouseDownEvent(object sender, Axmscomctl.ISliderEvents_MouseDownEvent e)
         {
-            //sbProgress.Value = e.x;
-            Console.Out.WriteLine($"DOWN e.x: {e.x} sbProgress.Value: {sbProgress.Value} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
-            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+            if (e.button != 1) return;
+            seeking = true;
+            seekStartX = Cursor.Position.X;
         }
 
         private void sbProgress_MouseUpEvent(object sender, Axmscomctl.ISliderEvents_MouseUpEvent e)
         {
-            //sbProgress.Value = e.x;
-            //Console.Out.WriteLine($"UP e.x: {e.x} currentPosition: {wmPlayer.Ctlcontrols.currentPosition}");
-            //wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+            if (!seeking) return;
+            seeking = false;
+            if (wmPlayer.currentMedia == null || sbProgress.Max <= 0) return;
+            // A press that barely moved is a click: go to the clicked spot rather than the slider's page step
+            Point at = Cursor.Position;
+            bool click = Math.Abs(at.X - seekStartX) <= clickSlop;
+            jumpTo(click ? chapterMarkers.secondsAt(at, sbProgress.Max) : sbProgress.Value);
         }
 
         private void sbProgress_Scroll(object sender, EventArgs e)
         {
-            wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
+            // While dragging only preview the time; the seek happens on mouse up
+            if (seeking) lblElapsed.Text = Chapter.formatTime(sbProgress.Value);
+            else if (wmPlayer.currentMedia != null) wmPlayer.Ctlcontrols.currentPosition = sbProgress.Value;
         }
 
         // Swap in the chapters saved for the video that was just opened
@@ -383,11 +396,11 @@ namespace JVP
         private void timer1_Tick(object sender, EventArgs e)
         {
             setDuration();
-            if (sbProgress.Max > 0)
+            if (sbProgress.Max > 0 && !seeking)
             {
                 sbProgress.Value = (int)wmPlayer.Ctlcontrols.currentPosition;
                 sbProgress.SelLength = sbProgress.Value;
-                lblElapsed.Text = string.IsNullOrWhiteSpace(wmPlayer.Ctlcontrols.currentPositionString) ? "00:00:00" : wmPlayer.Ctlcontrols.currentPositionString;
+                lblElapsed.Text = Chapter.formatTime((int)wmPlayer.Ctlcontrols.currentPosition);
             }
         }
 
@@ -417,15 +430,15 @@ namespace JVP
         }
 
         // Display only: hh:mm:ss when there are hours, otherwise mm:ss. The file still stores seconds.
-        public string displayTime
+        public string displayTime => formatTime(value);
+
+        // Also used for the elapsed label, so it only grows an hours part on videos that have one
+        public static string formatTime(int seconds)
         {
-            get
-            {
-                TimeSpan t = TimeSpan.FromSeconds(value);
-                return t.TotalHours >= 1
-                    ? $"{(int)t.TotalHours:00}:{t.Minutes:00}:{t.Seconds:00}"
-                    : $"{t.Minutes:00}:{t.Seconds:00}";
-            }
+            TimeSpan t = TimeSpan.FromSeconds(seconds);
+            return t.TotalHours >= 1
+                ? $"{(int)t.TotalHours:00}:{t.Minutes:00}:{t.Seconds:00}"
+                : $"{t.Minutes:00}:{t.Seconds:00}";
         }
 
         public int CompareTo(Chapter other)
