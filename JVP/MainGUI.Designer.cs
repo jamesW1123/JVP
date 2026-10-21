@@ -198,8 +198,7 @@
             this.btnForward.TabIndex = 3;
             this.btnForward.Text = "F";
             this.btnForward.UseVisualStyleBackColor = true;
-            this.btnForward.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseDown);
-            this.btnForward.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnForward_MouseUp);
+            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
             // 
             // btnPrevChapter
             // 
@@ -254,8 +253,7 @@
             this.btnRewind.TabIndex = 1;
             this.btnRewind.Text = "R";
             this.btnRewind.UseVisualStyleBackColor = true;
-            this.btnRewind.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnRewind_MouseDown);
-            this.btnRewind.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnRewind_MouseUp);
+            this.btnRewind.Click += new System.EventHandler(this.btnRewind_Click);
             // 
             // btnPlay
             // 
